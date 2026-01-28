@@ -40,6 +40,7 @@ dependencies:
   provider: ^6.1.5+1
   mobile_scanner: ^7.0.1
   intl: ^0.20.2
+  flutter_launcher_icons: ^0.14.4
 
 dev_dependencies:
   flutter_test:
@@ -93,3 +94,9 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icon/app_icon.png"
+  adaptive_icon_background: "#111827"
+  adaptive_icon_foreground: "assets/icon/app_icon.png"

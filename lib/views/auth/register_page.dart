@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import '../../widgets/custom_button.dart';
+import '../../widgets/custom_input.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -13,6 +15,7 @@ class _RegisterPageState extends State<RegisterPage> {
   final _pass = TextEditingController();
   bool _loading = false;
   String? _error;
+  bool _showPassword = false;
 
   Future<void> _register() async {
     setState(() {
@@ -36,37 +39,82 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Register')),
+      appBar: AppBar(title: const Text('Create account')),
       body: Center(
-        child: SizedBox(
-          width: 420,
-          child: Card(
-            margin: const EdgeInsets.all(24),
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: _email,
-                    decoration: const InputDecoration(labelText: 'Email'),
-                  ),
-                  const SizedBox(height: 8),
-                  TextField(
-                    controller: _pass,
-                    decoration: const InputDecoration(labelText: 'Password'),
-                    obscureText: true,
-                  ),
-                  const SizedBox(height: 12),
-                  if (_error != null)
-                    Text(_error!, style: const TextStyle(color: Colors.red)),
-                  ElevatedButton(
-                    onPressed: _loading ? null : _register,
-                    child: _loading
-                        ? const CircularProgressIndicator()
-                        : const Text('Register'),
-                  ),
-                ],
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 460),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Card(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Register',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      'After registration, an admin must activate your account.',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium
+                          ?.copyWith(color: Theme.of(context).hintColor),
+                    ),
+                    const SizedBox(height: 16),
+                    AppTextField(
+                      controller: _email,
+                      label: 'Email',
+                      keyboardType: TextInputType.emailAddress,
+                      textInputAction: TextInputAction.next,
+                      prefixIcon: const Icon(Icons.email_outlined),
+                    ),
+                    const SizedBox(height: 10),
+                    AppTextField(
+                      controller: _pass,
+                      label: 'Password',
+                      obscureText: !_showPassword,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _loading ? null : _register(),
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      suffixIcon: IconButton(
+                        tooltip:
+                            _showPassword ? 'Hide password' : 'Show password',
+                        onPressed: () =>
+                            setState(() => _showPassword = !_showPassword),
+                        icon: Icon(
+                          _showPassword
+                              ? Icons.visibility_off_outlined
+                              : Icons.visibility_outlined,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    if (_error != null)
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: Text(
+                          _error!,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.error,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    PrimaryButton(
+                      label: 'Register',
+                      icon: Icons.person_add_alt_1,
+                      loading: _loading,
+                      onPressed: _loading ? null : _register,
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

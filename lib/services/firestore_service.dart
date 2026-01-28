@@ -133,6 +133,7 @@ class FirestoreService {
       result.add({
         'sn': log.sn,
         'date': log.timestamp,
+        'reason': log.reason,
         'jobOrderNumber': jobData['orderNumber'] ?? '',
         'clientName': jobData['clientName'] ?? '',
         'itemCode': itemData['code'] ?? '',

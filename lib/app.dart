@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'views/auth/login_page.dart';
 import 'views/home/home_page.dart';
 import 'utils/constants.dart';
+import 'theme/app_theme.dart';
 
 class WorkerApp extends StatelessWidget {
   const WorkerApp({super.key});
@@ -11,7 +12,7 @@ class WorkerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Worker App',
-      theme: ThemeData(primarySwatch: Colors.blue),
+      theme: AppTheme.light(),
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {

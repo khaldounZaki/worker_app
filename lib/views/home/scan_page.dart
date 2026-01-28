@@ -175,79 +175,135 @@ class _ScanPageState extends State<ScanPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Scan or Enter SN')),
-      body: Column(
-        children: [
-          // QR / Barcode scanner
-          SizedBox(
-            height: 250,
-            child: Stack(
-              children: [
-                MobileScanner(
-                  controller: MobileScannerController(
-                    detectionSpeed: DetectionSpeed.noDuplicates,
-                  ),
-                  onDetect: (capture) {
-                    final bar = capture.barcodes.first;
-                    final raw = bar.rawValue ?? '';
-                    if (raw.isNotEmpty) {
-                      setState(() {
-                        _scannedValue = raw;
-                        _snController.text = raw; // auto-fill input
-                      });
-                    }
-                  },
-                ),
-                if (_processing)
-                  const Align(
-                    alignment: Alignment.topCenter,
-                    child: Padding(
-                      padding: EdgeInsets.all(12),
-                      child: Card(
-                        child: Padding(
-                          padding: EdgeInsets.all(8),
-                          child: Text('Processing...'),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
+            Card(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(16),
+                child: SizedBox(
+                  height: 260,
+                  child: Stack(
+                    children: [
+                      MobileScanner(
+                        key: _scannerKey,
+                        controller: MobileScannerController(
+                          detectionSpeed: DetectionSpeed.noDuplicates,
+                        ),
+                        onDetect: (capture) {
+                          final bar = capture.barcodes.first;
+                          final raw = bar.rawValue ?? '';
+                          if (raw.isNotEmpty) {
+                            setState(() {
+                              _scannedValue = raw;
+                              _snController.text = raw; // auto-fill input
+                            });
+                          }
+                        },
+                      ),
+                      Positioned(
+                        left: 12,
+                        right: 12,
+                        bottom: 12,
+                        child: Card(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceContainerHighest
+                              .withOpacity(0.92),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Row(
+                              children: [
+                                const Icon(Icons.qr_code_scanner),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Text(
+                                    _scannedValue == null
+                                        ? 'Point the camera at the SN barcode/QR'
+                                        : 'Scanned: $_scannedValue',
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                if (_processing)
+                                  const SizedBox(
+                                    height: 18,
+                                    width: 18,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Manual input
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: TextField(
-              controller: _snController,
-              decoration: const InputDecoration(
-                labelText: 'Enter SN',
-                border: OutlineInputBorder(),
+                ),
               ),
             ),
-          ),
-
-          const SizedBox(height: 16),
-
-          // Start button
-          ElevatedButton.icon(
-            onPressed: _processing
-                ? null
-                : () {
-                    final sn = _snController.text.trim();
-                    if (sn.isEmpty) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Enter or scan an SN.')),
-                      );
-                      return;
-                    }
-                    _handleScan(sn);
-                  },
-            icon: const Icon(Icons.check_circle),
-            label: const Text('Start Process'),
-          ),
-        ],
+            const SizedBox(height: 16),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Manual entry',
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium
+                          ?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 10),
+                    TextField(
+                      controller: _snController,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) {
+                        if (_processing) return;
+                        final sn = _snController.text.trim();
+                        if (sn.isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Enter or scan an SN.')),
+                          );
+                          return;
+                        }
+                        _handleScan(sn);
+                      },
+                      decoration: const InputDecoration(
+                        labelText: 'SN',
+                        hintText: 'Example: SN-123456',
+                        prefixIcon: Icon(Icons.confirmation_number_outlined),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    FilledButton.icon(
+                      onPressed: _processing
+                          ? null
+                          : () {
+                              final sn = _snController.text.trim();
+                              if (sn.isEmpty) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Enter or scan an SN.'),
+                                  ),
+                                );
+                                return;
+                              }
+                              _handleScan(sn);
+                            },
+                      icon: const Icon(Icons.check_circle_outline),
+                      label: const Text('Record scan'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

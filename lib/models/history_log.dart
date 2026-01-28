@@ -34,6 +34,7 @@ class HistoryLog {
       jobOrderId: data['jobOrderId'] ?? '',
       itemId: data['itemId'] ?? '',
       timestamp: (data['timestamp'] as Timestamp).toDate(),
+      reason: data['reason'],
     );
   }
 
